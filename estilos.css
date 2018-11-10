@@ -29,9 +29,9 @@ ul.menu-inicial a{
 
 ul.contProduccion{
      display: flex;
+     list-style : none;
 }
 
 ul.contProduccion li{
-	 text-decoration: none;
-	 list-style : none;
+	 padding: 0px 10px;
 }

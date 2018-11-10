@@ -25,19 +25,21 @@
 		    <h3>
 		     P : {
             </h3>
-            <ul class = "contProduccion">
+            <ul class = "contProduccion" id = "contProduccion">
 			   <li><input type="text" id= "noTerminales"></li>
 			   <li><h3> --> </h3></li>
 			   <li><input type="text" id= "produccion"></li>
-			   <li><div class = "boton-produccion">
-			   <button>+</button>
-			   <button>terminar</button>
-			   </li>
-            </div>	
             </ul>			
-	     </div>
+			   <li id = "nuevas-producciones"></li>
+			</ul>	
+			<button onclick = "agregarProduccion()" id = "sigProduccion">+</button>
+			<button id = "terminarProducciones">terminar</button>			
+		 </div>
+		 <span id = "nuevos-terminales">
+              
+		 </span>
 	     <div class = "botones">
-			 <button>+</button>
+			 <button onclick = "agregarNT()" id = "SiguienteNT">+</button>
 			 <button>terminar</button>
 	     </div>
          <h3>
