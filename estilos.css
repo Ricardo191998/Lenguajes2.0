@@ -9,7 +9,7 @@ header.hmenu{
 .contenedor{
      background-image: ;
 	 position: absolute;
-	 background-color: #00000;
+	 background-color: #000000;
 }
 
 .titulo{
@@ -19,7 +19,7 @@ header.hmenu{
 }
 
 .producciones{
-    diplay : float;	
+    display : flex;	
 }
 
 ul.menu-inicial a{

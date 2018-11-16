@@ -21,26 +21,24 @@
 		 </nav>
 	 </header>
 	 <div class ="contenido">
+		<h3>
+			P : {
+		</h3>
 	     <div class = "producciones">
-		    <h3>
-		     P : {
-            </h3>
-            <ul class = "contProduccion" id = "contProduccion">
-			   <li><input type="text" id= "noTerminales"></li>
+            <ul class = "contProduccion" id = "contProduccion" >
+			   <li><input id= "noTerminales"></li>
 			   <li><h3> --> </h3></li>
-			   <li><input type="text" id= "produccion"></li>
-            </ul>			
-			   <li id = "nuevas-producciones"></li>
 			</ul>	
-			<button onclick = "agregarProduccion()" id = "sigProduccion">+</button>
+			<input type="text" id= "produccion">	
+			<button onclick = "agregarProduccion(contProduccion,produccion)" id = "sigProduccion">+</button>
 			<button id = "terminarProducciones">terminar</button>			
 		 </div>
 		 <span id = "nuevos-terminales">
               
 		 </span>
-	     <div class = "botones">
-			 <button onclick = "agregarNT()" id = "SiguienteNT">+</button>
+	     <div class = "botones" id = "botones">
 			 <button>terminar</button>
+			 <button onclick = "agregarNT(noTerminales)" id = "SiguienteNT">+</button>
 	     </div>
          <h3>
 		    }
