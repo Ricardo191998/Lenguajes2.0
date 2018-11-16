@@ -10,36 +10,34 @@ function ProduccionAceptada(valor){
 }
 
 
-function agregarProduccion(lugarNP, produccion){   //Al presionar el botón de + a lado de la casilla de producciones se realiza esta función para crear una nuva casilla de input 
-    console.log("hello");
+function agregarPalabra(lugarNP, produccion){   //Al presionar el botón de + a lado de la casilla de palabras se realiza esta función para abrir una nuva casilla de input y crear una nueva palabra
     var botonSigProduccion = document.getElementById('sigProduccion');
     var botonTerminarProduccion = document.getElementById('terminarProducciones');
     var produccionIngresada = document.createElement("h3");
-    console.log(produccion.value); 
     if(produccion.value == ''){
         produccionIngresada.innerHTML = "ε |";
         lugarNP.appendChild(produccionIngresada);
-         
-        /* if(typeof lugarNP.firstChild.nextSibling.firstChild.value == "string"){
-            agregarProduccion(lugarNP.firstChild.nextSibling.firstChild.value, "ε" );
+        if(typeof lugarNP.firstChild.nextSibling.firstChild.value == "string"){
+            agregarProduccionesObjetos(lugarNP.firstChild.nextSibling.firstChild.value, "ε" );
         }else{
-            agregarProduccion(lugarNP.firstChild.firstChild.value,"ε") ;
-        }*/
+            agregarProduccionesObjetos(lugarNP.firstChild.firstChild.value,"ε") ;
+        }
     }else{
         var valorP = produccion.value;
         produccion.value = "";
         produccionIngresada.innerHTML = "   " + valorP +" | ";
         lugarNP.appendChild(produccionIngresada);  
-        /*if(typeof lugarNP.firstChild.nextSibling.firstChild.value == "string"){
-            agregarProduccion(lugarNP.firstChild.nextSibling.firstChild.value, valorP );
+        if(typeof lugarNP.firstChild.nextSibling.firstChild.value == "string"){
+            agregarProduccionesObjetos(lugarNP.firstChild.nextSibling.firstChild.value, valorP );
         }else{
-            agregarProduccion(lugarNP.firstChild.firstChild.value,valorP) ;
-        }*/
+            agregarProduccionesObjetos(lugarNP.firstChild.firstChild.value,valorP) ;
+        }
          
     }
 }
 
-function agregarNT(noTerminal){
+function agregarNT(noTerminal){   //Cuando se presiona el boton con signo (+), por medio des esta función se crean nuevos noTerminales o producciones
+    console.log(noTerminal.value);
     if(noTerminal.value == noTerminal.value.toLowerCase() || "number" == typeof noTerminal || noTerminal.value == '' || noTerminal.value.length > 1){
         alert("Ingresa una letra mayuscula");
     }else if(recorrerListaNT(noTerminal.value)){
@@ -47,8 +45,7 @@ function agregarNT(noTerminal){
     }else{
         noTerminal.disabled = true;
         var lugar = document.getElementById("nuevos-terminales");
-        var produccion1 = new ProduccionAceptada(noTerminal.value);
-        listaDeNoTerminales.push(produccion1);
+        listaDeNoTerminales.push(new ProduccionAceptada(noTerminal.value));
         agregarProducciones(lugar)  
         console.log(listaDeNoTerminales);  
     }
@@ -65,16 +62,16 @@ function agregarProducciones(span){
     var noTerminalSig = document.createElement("input");
     var flecha = document.createElement("h3");
     var produccionSig = document.createElement("input");
-    var botonesProduccionSig = document.createElement("button");
-    var botonesProduccionTer = document.createElement("button");
+    var botonesPalabraSig = document.createElement("button");
+    var botonesPalabraTer = document.createElement("button");
     
     //Funcion para los nuevos botones y reasignación para los ya creados
     
-    botonesProduccionSig.addEventListener("click", ()=>{
-        agregarProduccion(barra,produccionSig); 
+    botonesPalabraSig.addEventListener("click", ()=>{
+        agregarPalabra(barra,produccionSig); 
     });
     
-    nuevosNT.addEventListener("click", ()=>{
+    nuevosNT.addEventListener("click", ()=>{    //
         agregarNT(noTerminalSig);
     });
     
@@ -86,9 +83,9 @@ function agregarProducciones(span){
 
     //Asignando valores a las nuevas etiquetas
     flecha.innerHTML = "--->";
-    botonesProduccionSig.innerHTML = "+";
+    botonesPalabraSig.innerHTML = "+";
+    botonesPalabraTer.innerHTML = "terminal";
     nuevosNT.innerHTML = "+";
-    botonesProduccionTer.innerHTML = "terminal";
     
     //Agregando las etiquetas al la barra 
     li_noTerminalSig.appendChild(noTerminalSig);
@@ -97,10 +94,12 @@ function agregarProducciones(span){
     barra.appendChild(li_noTerminalSig);
     barra.appendChild(li_flecha);
     
+    
+    //Agregando las etiquetas al div de las producciones
     contenidoSigProduccion.appendChild(barra);
     contenidoSigProduccion.appendChild(produccionSig);
-    contenidoSigProduccion.appendChild(botonesProduccionSig);
-    contenidoSigProduccion.appendChild(botonesProduccionTer);
+    contenidoSigProduccion.appendChild(botonesPalabraSig);
+    contenidoSigProduccion.appendChild(botonesPalabraTer);
     
     //Estilos de las etiquetas 
     barra.style.display = "flex";
@@ -115,7 +114,7 @@ function agregarProducciones(span){
 }
 
 
-function recorrerListaNT(noTerminal){
+function recorrerListaNT(noTerminal){  
     if(listaDeNoTerminales.length == 0){
         return false;
     }
@@ -127,14 +126,10 @@ function recorrerListaNT(noTerminal){
     return false;
 }
 
-function agregarProducciones(noTerminal, nuevaProduccion){
+function agregarProduccionesObjetos(noTerminal, nuevaProduccion){ //Agrega a la lista de producciones la nueva producción
     for(var i = 0 ; i < listaDeNoTerminales.length; i++ ){
         if(listaDeNoTerminales[i].valor == noTerminal){
-           listaDeNoTerminales[i].produccion.push(nuevaProduccion);
+           listaDeNoTerminales[i].producciones.push(nuevaProduccion);
         }
     }
-}
-
-function validarNT(noTerminal){
-    
 }
