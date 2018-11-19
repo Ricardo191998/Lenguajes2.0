@@ -1,6 +1,13 @@
+//Script Recibe elementos del usuario y contiene los algoritmos para convertir gramaticas impropias a propias
 
-var produccionAceptada = {valor : "" , producciones : []};
-var listaDeNoTerminales = [];
+
+var produccionAceptada = {valor : "" , producciones : []}; //Producciones con sus respectivas palabras
+var listaDeNoTerminales = []; //Lista de objetos ingresados por el usuario
+var inputNt = [];
+var noTerminalesli = []; //Lista final de NT
+var produccionesH3 = []; //
+var alfabeto = []; //lista con la palabras del alfabeto
+var c = 0;  //contador, util para asignar palabras a sus producciones correspondientes
 
 //creando el constructor de la clase produccionAceptada
 
@@ -10,7 +17,77 @@ function ProduccionAceptada(valor){
 }
 
 
-function agregarPalabra(lugarNP, produccion){   //Al presionar el botón de + a lado de la casilla de palabras se realiza esta función para abrir una nuva casilla de input y crear una nueva palabra
+//Al presionar el boton de terminar obtienen la Gramatica
+
+function obtenerGramatica(){
+    if(listaDeNoTerminales.length == 0){ 
+       alert('No has ingresado ninguna producción');
+       return;
+    }
+    else{
+        
+        //Declarando variables para la nueva visualización
+        var contenido = document.getElementById("contenido");
+        var body_programa = document.getElementById("body_programa");
+        var divGramatica = document.createElement("div");
+        var botonConvertir = document.createElement("button");
+        
+        //Atributos del Boton
+
+        botonConvertir.innerHTML = "Convertir";
+        botonConvertir.style.padding = "150px 0px";
+        botonConvertir.addEventListener('onclick',()=>{
+             eliminacionSimbolosMuertos();
+        });
+
+        //Eliminamos las entradas
+        contenido.remove();
+        
+
+        //Creando elementos para el front 
+        for(var i =0 ; i < 4;i++){
+        var h3 = document.createElement("h3");
+        h3.style.padding = '30px 100px';
+        switch(i){
+            case 0 :
+                h3.innerHTML = 'S  =  {' + listaDeNoTerminales[0].valor + '}';
+            break;
+            case 1 :
+                obtenerListaNT();
+                h3.innerHTML = 'NT =  {' + noTerminalesli + '}';
+                break;
+            case 2 :
+                obtenerAlfabeto();
+                h3.innerHTML = '∑  =  {'+ alfabeto + '}';
+                break;
+            case 3 : 
+                var divProducciones = document.createElement('div');
+                var producciones1 = document.createElement('h3');
+                var producciones3 = document.createElement('h3');
+                producciones1.innerHTML = 'P : { ';
+                producciones3.innerHTML = '}';
+                divProducciones.appendChild(producciones1);
+                for(var n = 0 ; n < listaDeNoTerminales.length ; n++){
+                        var producciones2 = document.createElement('h3');
+                        producciones2.innerHTML = listaDeNoTerminales[n].valor + '--->' + listaDeNoTerminales[n].producciones;
+                        divProducciones.appendChild(producciones2); 
+                } 
+                divProducciones.appendChild(producciones3);
+                divProducciones.style.padding = '30px 100px';
+                divGramatica.appendChild(divProducciones);
+                break;     
+        }
+        //Agregamos los resultados a una nueva visualización de la pantalla. 
+        divGramatica.appendChild(h3);
+        }
+        divGramatica.appendChild(botonConvertir);
+        body_programa.appendChild(divGramatica);
+    }
+}
+
+
+//Al presionar el botón de + a lado de la casilla de palabras se realiza esta función para abrir una nuva casilla de input y crear una nueva palabra
+function agregarPalabra(lugarNP, produccion){   
     var botonSigProduccion = document.getElementById('sigProduccion');
     var botonTerminarProduccion = document.getElementById('terminarProducciones');
     var produccionIngresada = document.createElement("h3");
@@ -36,12 +113,15 @@ function agregarPalabra(lugarNP, produccion){   //Al presionar el botón de + a 
     }
 }
 
-function agregarNT(noTerminal){   //Cuando se presiona el boton con signo (+), por medio des esta función se crean nuevos noTerminales o producciones
-    console.log(noTerminal.value);
+//Cuando se presiona el boton con signo (+), por medio des esta función se crean nuevos noTerminales o producciones
+function agregarNT(noTerminal){   
+    //console.log(noTerminal.value);
     if(noTerminal.value == noTerminal.value.toLowerCase() || "number" == typeof noTerminal || noTerminal.value == '' || noTerminal.value.length > 1){
         alert("Ingresa una letra mayuscula");
+        if(c!=0){c--};
     }else if(recorrerListaNT(noTerminal.value)){
         alert("Ingresa un elemento que no se repita");
+        c--;
     }else{
         noTerminal.disabled = true;
         var lugar = document.getElementById("nuevos-terminales");
@@ -63,8 +143,11 @@ function agregarProducciones(span){
     var flecha = document.createElement("h3");
     var produccionSig = document.createElement("input");
     var botonesPalabraSig = document.createElement("button");
-    var botonesPalabraTer = document.createElement("button");
     
+    //Asignando una lista para los input de NT
+
+    inputNt.push(noTerminalSig);
+
     //Funcion para los nuevos botones y reasignación para los ya creados
     
     botonesPalabraSig.addEventListener("click", ()=>{
@@ -72,9 +155,11 @@ function agregarProducciones(span){
     });
     
     nuevosNT.addEventListener("click", ()=>{    //
-        agregarNT(noTerminalSig);
+        agregarNT(inputNt[c]);
+        c++;
     });
     
+
     if (siguienteNT !=null){
         siguienteNT.remove();
         divBoton.appendChild(nuevosNT);
@@ -84,7 +169,6 @@ function agregarProducciones(span){
     //Asignando valores a las nuevas etiquetas
     flecha.innerHTML = "--->";
     botonesPalabraSig.innerHTML = "+";
-    botonesPalabraTer.innerHTML = "terminal";
     nuevosNT.innerHTML = "+";
     
     //Agregando las etiquetas al la barra 
@@ -99,7 +183,6 @@ function agregarProducciones(span){
     contenidoSigProduccion.appendChild(barra);
     contenidoSigProduccion.appendChild(produccionSig);
     contenidoSigProduccion.appendChild(botonesPalabraSig);
-    contenidoSigProduccion.appendChild(botonesPalabraTer);
     
     //Estilos de las etiquetas 
     barra.style.display = "flex";
@@ -115,10 +198,10 @@ function agregarProducciones(span){
 
 
 function recorrerListaNT(noTerminal){  
-    if(listaDeNoTerminales.length == 0){
+    if(inputNt.length == 0){
         return false;
     }
-    for(var i = 0 ; i < listaDeNoTerminales.length; i++ ){
+    for(var i = 0 ; i < inputNt.length; i++ ){
         if(listaDeNoTerminales[i].valor == noTerminal){
            return true;
         }
@@ -133,3 +216,87 @@ function agregarProduccionesObjetos(noTerminal, nuevaProduccion){ //Agrega a la 
         }
     }
 }
+
+function obtenerListaNT(noTerminal){  
+    for(var i = 0 ; i < listaDeNoTerminales.length; i++ ){
+        noTerminalesli.push(listaDeNoTerminales[i].valor);
+    }
+}
+
+function obtenerAlfabeto(){
+
+    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
+             for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
+                 if(listaDeNoTerminales[i].producciones[n][k]== listaDeNoTerminales[i].producciones[n][k].toLowerCase()){
+                     alfabeto.push(listaDeNoTerminales[i].producciones[n][k]);
+                 }  
+             } 
+        /* listaDeNoTerminales[i].producciones[n].forEach(element => {
+             console.log(element);
+             if(element == element.toLowerCase()){
+                alfabeto.push(element);
+             }
+         });*/
+       }
+    }
+    alfabeto.sort();
+    console.log(alfabeto);
+    for(n= 0; n < alfabeto.length; n++){
+        if(n>0){
+            if(alfabeto[n]==alfabeto[n-1]){
+                alfabeto.splice(n,1);
+                n = n-1;
+            }
+        }
+    }
+    console.log(alfabeto);
+}
+
+function accionConvertir(){
+    var boton
+}
+
+
+function eliminacionSimbolosMuertos(){
+    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+        for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
+            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
+                if(!recorrerListaNT(listaDeNoTerminales[i].producciones[n][k])){
+                    listaDeNoTerminales[i].producciones.splice(n, 1)
+                    n = n-1;
+                 }
+            }
+        }
+    }
+    for(elemento in listaDeNoTerminales){
+        console.log(elemento.producciones);
+    }
+   
+}
+
+
+/*function recorerProducciones(NT){ //Recorre una lista de NT 
+     
+}
+
+function compararPalabra(palabra, n ){ //Compara el elemento palabra para saber si tiene un elemento que no es perteneciente a NT
+    for(elemento in palabra){
+        if(!recorrerListaNT(elemento)){
+            return false;
+        }
+    }
+}*/
+
+function eliminacionSimbolosInaccesibles(){
+
+}
+
+function eliminacionProduccionesVacias(){
+
+}
+
+function eliminacionSimbolosUnitarios(){
+
+}
+

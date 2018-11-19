@@ -7,7 +7,7 @@
 	 <script type ="text/javascript" src = "lenguajes.js"> </script>
 	 <link rel="stylesheet" type="text/css" href="estilos.css">
 </head>
-<body>
+<body id= "body_programa">
      <header class = "hmenu">
 	     <div class = "h-contenedor">
 		     <h1 class = "titulo">Lenguajes Formales y Automatas</h1>
@@ -20,7 +20,7 @@
 			 </ul>
 		 </nav>
 	 </header>
-	 <div class ="contenido">
+	 <div class ="contenido" id = "contenido">
 		<h3>
 			P : {
 		</h3>
@@ -30,14 +30,13 @@
 			   <li><h3> --> </h3></li>
 			</ul>	
 			<input type="text" id= "produccion">	
-			<button onclick = "agregarPalabra(contProduccion,produccion)" id = "sigProduccion">+</button>
-			<button id = "terminarProducciones">terminar</button>			
+			<button onclick = "agregarPalabra(contProduccion,produccion)" id = "sigProduccion">+</button>		
 		 </div>
 		 <span id = "nuevos-terminales">
               
 		 </span>
 	     <div class = "botones" id = "botones">
-			 <button>terminar</button>
+			 <button onclick = "obtenerGramatica()">terminar</button>
 			 <button onclick = "agregarNT(noTerminales)" id = "SiguienteNT">+</button>
 	     </div>
          <h3>
