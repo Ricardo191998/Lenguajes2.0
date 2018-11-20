@@ -17,9 +17,10 @@ function ProduccionAceptada(valor){
 }
 
 
-//Al presionar el boton de terminar obtienen la Gramatica
+//Al presionar el boton de terminar obtienen la Gramática
 
 function obtenerGramatica(){
+    console.log(inputNt);
     if(listaDeNoTerminales.length == 0){ 
        alert('No has ingresado ninguna producción');
        return;
@@ -36,7 +37,7 @@ function obtenerGramatica(){
 
         botonConvertir.innerHTML = "Convertir";
         botonConvertir.style.padding = "150px 0px";
-        botonConvertir.addEventListener('onclick',()=>{
+        botonConvertir.addEventListener('click',()=>{
              eliminacionSimbolosMuertos();
         });
 
@@ -250,43 +251,98 @@ function obtenerAlfabeto(){
             }
         }
     }
-    console.log(alfabeto);
 }
 
-function accionConvertir(){
-    var boton
-}
+//Algoritmos que convierten la gramática impropia a propia 
 
 
+//Funcion que elimina los ímbolos inútiles 
 function eliminacionSimbolosMuertos(){
-    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+    recorrerPalabras(eliminacionSimbolosMuertos1);
+    c = 0;
+    /*for(var i = 0 ; i<listaDeNoTerminales.length; i++){
         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
             for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
-                if(!recorrerListaNT(listaDeNoTerminales[i].producciones[n][k])){
-                    listaDeNoTerminales[i].producciones.splice(n, 1)
-                    n = n-1;
+                if(listaDeNoTerminales[i].producciones[n][k] == listaDeNoTerminales[i].producciones[n][k].toUpperCase()){
+                    if(recorrerListaNT(listaDeNoTerminales[i].producciones[n][k])){
+                    }else{
+                        listaDeNoTerminales[i].producciones.splice(n, 1)
+                        if(n!=0){
+                            n = n-1;
+                        }
+                    }
                  }
             }
         }
-    }
-    for(elemento in listaDeNoTerminales){
-        console.log(elemento.producciones);
-    }
-   
+    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+        for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
+            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
+                if(listaDeNoTerminales[i].producciones[n][k] == listaDeNoTerminales[i].producciones[n][k].toUpperCase()){
+                    if(recorrerListaNT(listaDeNoTerminales[i].producciones[n][k])){
+                       c++;
+                    }
+                 }
+            }
+        }
+    }*/
+    console.log(listaDeNoTerminales);
+    
 }
 
+//-----------------------------------
 
-/*function recorerProducciones(NT){ //Recorre una lista de NT 
-     
-}
-
-function compararPalabra(palabra, n ){ //Compara el elemento palabra para saber si tiene un elemento que no es perteneciente a NT
-    for(elemento in palabra){
-        if(!recorrerListaNT(elemento)){
-            return false;
+function recorrerPalabras(funcion){
+    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+        for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
+            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
+                 n = funcion(listaDeNoTerminales[i].producciones[n][k] ,i, n);
+            }
         }
     }
-}*/
+}
+
+var eliminacionSimbolosMuertos1 = function(simbolo,i,n ){
+    if(simbolo== simbolo.toUpperCase()){
+        if(recorrerListaNT(simbolo)){
+        }else{
+            listaDeNoTerminales[i].producciones.splice(n, 1)
+            if(n!=0){
+                n = n-1;
+                return n ;
+            }
+        }
+     }
+}
+
+//-------------------------------------
+
+/*
+var n = 0;
+
+function recorrerNT(simbolo, n){
+    if(listaDeNoTerminales.length  == n){
+        return;
+    }else{
+        recorrePalabras(simbolo,listaDeNoTerminales[n]);
+        recorrerNT(noTerminal(simbolo,n+1));
+    }
+}
+
+var k = 0;
+
+function recorrerPalabras(simbolo,noTerminal){
+    if(noTerminal.producciones.length == k){
+        return; 
+    }else{
+        recorrerSimbolos(noTerminal.producciones[k]);
+        recorrerPalabras(noTerminal, k + 1);
+    }
+} 
+var i = 0;
+function recorrerSímbolo(palabra, i){
+
+}
+*/
 
 function eliminacionSimbolosInaccesibles(){
 
