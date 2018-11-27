@@ -1,5 +1,5 @@
-//Script Recibe elementos del usuario y contiene los algoritmos para convertir gramaticas impropias a propias
 
+//Script Recibe elementos del usuario y contiene los algoritmos para convertir gramaticas impropias a propias
 
 var produccionAceptada = {valor : "" , producciones : []}; //Producciones con sus respectivas palabras
 var listaDeNoTerminales = []; //Lista de objetos ingresados por el usuario
@@ -7,7 +7,7 @@ var inputNt = [];
 var noTerminalesli = []; //Lista final de NT
 var produccionesH3 = []; //
 var alfabeto = []; //lista con la palabras del alfabeto
-var c = 0;  //contador, util para asignar palabras a sus producciones correspondientes
+var c = 0 , q = 0;  //contador, util para asignar palabras a sus producciones correspondientes
 
 //creando el constructor de la clase produccionAceptada
 
@@ -20,13 +20,12 @@ function ProduccionAceptada(valor){
 //Al presionar el boton de terminar obtienen la Gramática
 
 function obtenerGramatica(){
-    console.log("A"=="a");
     if(listaDeNoTerminales.length == 0){ 
        alert('No has ingresado ninguna producción');
+       location.reload();
        return;
     }
     else{
-        
         //Declarando variables para la nueva visualización
         var contenido = document.getElementById("contenido");
         var body_programa = document.getElementById("body_programa");
@@ -37,10 +36,28 @@ function obtenerGramatica(){
 
         botonConvertir.innerHTML = "Convertir";
         botonConvertir.style.padding = "150px 0px";
+        
         botonConvertir.addEventListener('click',()=>{
-             eliminacionSimbolosMuertos(listaDeNoTerminales.length);
+            if(q == 0){
+                q++; 
+                eliminacionSimbolosMuertos(listaDeNoTerminales.length);
+            }else if(q ==1){
+                q++;
+                if(listaDeNoTerminales.length>1){
+                    eliminacionSimbolosInaccesibles(listaDeNoTerminales[1],1);
+                }else{
+                    obtenerGramatica();
+                }
+            }else if(q ==2){
+                q++;
+                if(listaDeNoTerminales.length>1){
+                    eliminacionProduccionesVacias();
+                }else{
+                    obtenerGramatica();
+                }
+            }
         });
-
+        
         //Eliminamos las entradas
         contenido.remove();
         
@@ -69,9 +86,18 @@ function obtenerGramatica(){
                 producciones3.innerHTML = '}';
                 divProducciones.appendChild(producciones1);
                 for(var n = 0 ; n < listaDeNoTerminales.length ; n++){
-                        var producciones2 = document.createElement('h3');
-                        producciones2.innerHTML = listaDeNoTerminales[n].valor + '--->' + listaDeNoTerminales[n].producciones;
-                        divProducciones.appendChild(producciones2); 
+                    for(k= 0; k < listaDeNoTerminales[n].producciones.length; k++){
+                        let palabras = listaDeNoTerminales[n].producciones;
+                        if(k>0){
+                            if(palabras[k]==palabras[k-1]){
+                                listaDeNoTerminales[n].producciones.splice(k,1);
+                                k = k-1;
+                            }
+                        }
+                    }
+                    var producciones2 = document.createElement('h3');
+                    producciones2.innerHTML = listaDeNoTerminales[n].valor + '--->' + listaDeNoTerminales[n].producciones;
+                    divProducciones.appendChild(producciones2); 
                 } 
                 divProducciones.appendChild(producciones3);
                 divProducciones.style.padding = '30px 100px';
@@ -82,7 +108,10 @@ function obtenerGramatica(){
         divGramatica.appendChild(h3);
         }
         divGramatica.appendChild(botonConvertir);
+        divGramatica.id = "contenido";
         body_programa.appendChild(divGramatica);
+        noTerminalesli = [];
+        alfabeto = [];
     }
 }
 
@@ -92,6 +121,7 @@ function agregarPalabra(lugarNP, produccion){
     var botonSigProduccion = document.getElementById('sigProduccion');
     var botonTerminarProduccion = document.getElementById('terminarProducciones');
     var produccionIngresada = document.createElement("h3");
+    //console.log(lugarNP.firstChild.firstchild.value);
     if(produccion.value == ''){
         produccionIngresada.innerHTML = "ε |";
         lugarNP.appendChild(produccionIngresada);
@@ -128,7 +158,6 @@ function agregarNT(noTerminal){
         var lugar = document.getElementById("nuevos-terminales");
         listaDeNoTerminales.push(new ProduccionAceptada(noTerminal.value));
         agregarProducciones(lugar)  
-        console.log(listaDeNoTerminales);  
     }
 }
 
@@ -233,12 +262,6 @@ function obtenerAlfabeto(){
                      alfabeto.push(listaDeNoTerminales[i].producciones[n][k]);
                  }  
              } 
-        /* listaDeNoTerminales[i].producciones[n].forEach(element => {
-             console.log(element);
-             if(element == element.toLowerCase()){
-                alfabeto.push(element);
-             }
-         });*/
        }
     }
     alfabeto.sort();
@@ -257,32 +280,40 @@ function obtenerAlfabeto(){
 
 //Funcion que elimina los ímbolos inútiles 
 function eliminacionSimbolosMuertos(tamanioProducciones){
+    
     //recorrerPalabras(eliminacionSimbolosMuertos1);
     c = 0;
-
+    var ban = true;
     //Eliminando Símbolos muertos tipo 1 
     for(var i = 0 ; i<listaDeNoTerminales.length; i++){
         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
-            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
-                if(listaDeNoTerminales[i].producciones[n][k] == listaDeNoTerminales[i].producciones[n][k].toUpperCase()){
-                    if(recorrerListaNT(listaDeNoTerminales[i].producciones[n][k]) || listaDeNoTerminales[i].producciones[n][k] == listaDeNoTerminales[i].producciones[n][k].toLowerCase){
-                    }else{
-                        listaDeNoTerminales[i].producciones.splice(n, 1)
-                        if(n!=0){
-                             n = n-1;    
-                        }
+            let produccionesVar = listaDeNoTerminales[i].producciones
+            ban = true;
+            console.log(produccionesVar);
+            for(var k = 0 ; k <  produccionesVar[n].length ; k++){
+                let valor = produccionesVar[n];
+                if(!recorrerListaNT(valor[k]) && valor[k] == valor[k].toUpperCase()){
+                    produccionesVar.splice(n, 1);
+                    if(n > 0 && ban == true ){
+                        n = n-1;
+                        ban = false;
+                    }else if(produccionesVar.length==0){
+                        alert("La gramatica se vacio");
+                        location.reload();
                     }
-                 }
+                }
             }
         }
     }
 
-    //Eliminando Símbolos muertos tipo 2 
+    //Eliminando Símbolos muertos tipo 2  
     for(var i = 0 ; i<listaDeNoTerminales.length; i++){
         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
-            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
-                if(listaDeNoTerminales[i].producciones[n][k] == listaDeNoTerminales[i].producciones[n][k].toUpperCase()){
-                    if(listaDeNoTerminales[i].producciones[n][k]==listaDeNoTerminales[i].valor){
+            let produccionesVar = listaDeNoTerminales[i].producciones
+            for(var k = 0 ; k <  produccionesVar[n].length ; k++){
+                let valor = listaDeNoTerminales[i].producciones[n];
+                if(valor[k] == valor[k].toUpperCase()){
+                    if(valor[k]==listaDeNoTerminales[i].valor){
                        c++;
                     }
                 }
@@ -296,88 +327,111 @@ function eliminacionSimbolosMuertos(tamanioProducciones){
             }
         }
     }
+    
     console.log(listaDeNoTerminales);
     if(listaDeNoTerminales.length<tamanioProducciones){
         eliminacionSimbolosMuertos(listaDeNoTerminales.length);
     }
-    //obtenerGramatica();
+    var h3 = document.createElement("h3");
+    h3.innerHTML = "Eliminaste símbolos muertos";
+    var body_programa = document.getElementById("body_programa");
+    body_programa.appendChild(h3);
+    obtenerGramatica();
 }
 
+//Función que elimina los símbolos inaccesibes
 
-
-
-//-----------------------------------
-/*
-function recorrerPalabras(funcion){
-    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+function eliminacionSimbolosInaccesibles(noTerminal, c){
+    for(var i = 1 ; i<listaDeNoTerminales.length; i++){
         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
-            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
-                 n = funcion(listaDeNoTerminales[i].producciones[n][k] ,i, n);
+            let produccionesVar = listaDeNoTerminales[i].producciones
+            for(var k = 0 ; k <  produccionesVar[n].length ; k++){
+                let valor = produccionesVar[n];
+                if(noTerminal == valor[k]){
+                    if(c == listaDeNoTerminales.length){
+                        var h3 = document.createElement("h3");
+                        h3.innerHTML = "Eliminaste símbolos inaccesibles";
+                        var body_programa = document.getElementById("body_programa");
+                        body_programa.appendChild(h3);
+                        obtenerGramatica();
+                    }
+                    eliminacionSimbolosInaccesibles(listaDeNoTerminales[c+1],c+1);
+                }                
             }
         }
     }
-}
-
-var eliminacionSimbolosMuertos1 = function(simbolo,i,n ){
-    if(simbolo== simbolo.toUpperCase()){
-        if(recorrerListaNT(simbolo)){
-        }else{
-            listaDeNoTerminales[i].producciones.splice(n, 1)
-            if(n!=0){
-                n = n-1;
-                return n ;
-            }
-        }
-     }
-}
-*/
-//-------------------------------------
-
-/*
-var n = 0;
-
-function recorrerNT(simbolo, n){
-    if(listaDeNoTerminales.length  == n){
-        return;
+    listaDeNoTerminales.splice(c,1);                                           //En caso de no haber encontradro coincidencias significa que el símbolo NT actual es inaccesible , por tanto se elimina 
+    if(listaDeNoTerminales.length == 1 ){
+        var h3 = document.createElement("h3");
+        h3.innerHTML = "Eliminaste símbolos inaccesibles";
+        var body_programa = document.getElementById("body_programa");
+        body_programa.appendChild(h3);
+        obtenerGramatica();
     }else{
-        recorrePalabras(simbolo,listaDeNoTerminales[n]);
-        recorrerNT(noTerminal(simbolo,n+1));
+        eliminacionProduccionesVacias(listaDeNoTerminales[c],c);
     }
 }
 
-var k = 0;
-
-function recorrerPalabras(simbolo,noTerminal){
-    if(noTerminal.producciones.length == k){
-        return; 
-    }else{
-        recorrerSimbolos(noTerminal.producciones[k]);
-        recorrerPalabras(noTerminal, k + 1);
-    }
-} 
-var i = 0;
-function recorrerSímbolo(palabra, i){
-
-}
-*/
-
-function eliminacionSimbolosInaccesibles(){
-    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
-        for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
-            for(var k = 0 ; k <  listaDeNoTerminales[i].producciones[n].length ; k++){
-                
-
-                
-            }
-        }
-    }
-}
+//Elimina producciones vacias de la gramática
 
 function eliminacionProduccionesVacias(){
-
+    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+        for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
+            let produccionesVar = listaDeNoTerminales[i].producciones
+            for(var k = 0 ; k <  produccionesVar[n].length ; k++){
+                let valor = produccionesVar[n];  
+                if(valor[k]=="ε" && produccionesVar.length == 1){
+                    produccionesVar.splice(n,1);
+                    encontrarSimboloVacio(listaDeNoTerminales[i]);
+                }     
+            }
+        }
+    }
 }
 
-function eliminacionSimbolosUnitarios(){
+function encontrarSimboloVacio(noTerminal){
+    for(var i = 0 ; i<listaDeNoTerminales.length; i++){
+        for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
+            let produccionesVar = listaDeNoTerminales[i].producciones
+            for(var k = 0 ; k < produccionesVar[n].length ; k++){
+                let valor = produccionesVar[n];  
+                if(noTerminal == valor[k] && listaDeNoTerminales.indexOf(noTerminal)== 0){
+                    listaDeNoTerminales.unshift(new ProduccionAceptada(listaDeNoTerminales[0]+'´'));
+                    listaDeNoTerminales[0].producciones.push(listaDeNoTerminales[0], "ε");
+                    remplazarSimboloVacio(produccionesVar, noTerminal);
+                }else if(noTerminal == valor[k]){
+                    remplazarSimboloVacio(produccionesVar, noTerminal);
+                }
+            }
+        }
+    }
+}
 
+function remplazarSimboloVacio(listaDePalabras, noTerminal){
+    var indicador = false;
+    var indices = [];    
+    for(var n = 0 ; n < listaDePalabras; n++){
+        let palabra = listaDePalabras[n];
+        for(var i = 0 ; i<palabra.length; i++){
+            if(noTerminal = palabra[i]){
+                indicador = true; 
+                indices.push(i);
+            }
+        }
+        if(indicador){
+            if(true){
+                for(var c = 0 ; c < indices.length ; c++){
+                    let nuevaPalabra = palabra.splice(indices[c],1);
+                    listaDePalabras.push()
+                 }
+            }
+        }
+    }
+}
+
+//eliminación de símbolos unitarios
+
+function eliminacionSimbolosUnitarios(){
+     
 }
 
