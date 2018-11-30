@@ -6,6 +6,11 @@ header.hmenu{
    background-color: red;
 }
 
+nav.menu{
+    background-color: gray;
+    align-content: flex-end;
+} 
+
 .contenedor{
      background-image: ;
 	 position: absolute;
@@ -24,8 +29,18 @@ header.hmenu{
 
 ul.menu-inicial a{
     text-decoration: none;
+    color: #000000;
+    padding : 10px 100px;
+    margin: 0px 10px;
+    font-size: 25px;
+    height: 40px;
+    border-bottom: red;
+    align-content: flex-end;
 }
 
+ul.menu-inicial a:hover { 
+    background-color: yellow;
+}
 
 ul.contProduccion{
      display: flex;
@@ -34,4 +49,8 @@ ul.contProduccion{
 
 ul.contProduccion li{
 	 padding: 0px 10px;
+}
+
+div.contenido {
+    align-content: center;
 }

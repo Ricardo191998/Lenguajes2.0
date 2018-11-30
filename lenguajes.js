@@ -34,7 +34,8 @@ function obtenerGramatica(){
 
         botonConvertir.innerHTML = "Convertir";
         botonConvertir.style.padding = "150px 0px";
-        
+        console.log(q);
+
         botonConvertir.addEventListener('click',()=>{
             if(q == 0){
                 q++;
@@ -42,7 +43,7 @@ function obtenerGramatica(){
             }else if(q ==1){
                 q++;
                 if(listaDeNoTerminales.length>1){
-                    eliminacionSimbolosInaccesibles(listaDeNoTerminales[1],2);
+                    eliminacionSimbolosInaccesibles(listaDeNoTerminales[1].valor,1);
                 }else{
                     obtenerGramatica();
                 }
@@ -281,7 +282,7 @@ function obtenerAlfabeto(){
 //Algoritmos que convierten la gramática impropia a propia 
 
 
-//Funcion que elimina los ímbolos inútiles 
+//Funcion que elimina los símbolos inútiles 
 function eliminacionSimbolosMuertos(tamanioProducciones){
     
     //recorrerPalabras(eliminacionSimbolosMuertos1);
@@ -329,6 +330,7 @@ function eliminacionSimbolosMuertos(tamanioProducciones){
                 c=0;
             }
         }
+        c = 0 ; 
     }
     
     console.log(listaDeNoTerminales);
@@ -343,15 +345,22 @@ function eliminacionSimbolosMuertos(tamanioProducciones){
 }
 
 //Función que elimina los símbolos inaccesibes
+ 
 
 function eliminacionSimbolosInaccesibles(noTerminal, c){
+    var ban = false;
     for(var i = 1 ; i<listaDeNoTerminales.length; i++){
         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
             let produccionesVar = listaDeNoTerminales[i].producciones
             for(var k = 0 ; k <  produccionesVar[n].length ; k++){
                 let valor = produccionesVar[n];
+                console.log('-----------');
+                console.log(noTerminal);
+                console.log('-----------');
+                console.log(valor[k]);
                 if(noTerminal == valor[k]){
-                    console.log(noTerminal);
+                    console.log(listaDeNoTerminales.length +"+"+c);
+                    ban = true;    
                     if(c == listaDeNoTerminales.length){
                         var h3 = document.createElement("h3");
                         h3.innerHTML = "Eliminaste símbolos inaccesibles";
@@ -360,20 +369,24 @@ function eliminacionSimbolosInaccesibles(noTerminal, c){
                         obtenerGramatica();
                         return;
                     }
-                    eliminacionSimbolosInaccesibles(listaDeNoTerminales[c+1],c+1);
+                    if(listaDeNoTerminales.length > c+1){
+                        eliminacionSimbolosInaccesibles(listaDeNoTerminales[c+1].valor,c+1);
+                    }
                 }                
             }
         }
     }
-    listaDeNoTerminales.splice(c,1);                                           //En caso de no haber encontradro coincidencias significa que el símbolo NT actual es inaccesible , por tanto se elimina 
-    if(listaDeNoTerminales.length == c-1 ){
+    if(!ban){
+         listaDeNoTerminales.splice(c,1);                                           //En caso de no haber encontradro coincidencias significa que el símbolo NT actual es inaccesible , por tanto se elimina 
+    }
+    if(listaDeNoTerminales.length == c ){
         var h3 = document.createElement("h3");
         h3.innerHTML = "Eliminaste símbolos inaccesibles";
         var body_programa = document.getElementById("body_programa");
         body_programa.appendChild(h3);
         obtenerGramatica();
-    }else{
-        eliminacionSimbolosInaccesibles(listaDeNoTerminales[c],c);
+    }else if(listaDeNoTerminales.length > c){
+        eliminacionSimbolosInaccesibles(listaDeNoTerminales[c].valor,c);
     }
 }
 
@@ -402,7 +415,7 @@ function encontrarSimboloVacio(noTerminal){
                 let valor = produccionesVar[n];  
                 if(noTerminal == valor[k] && listaDeNoTerminales.indexOf(noTerminal)== 0){
                     listaDeNoTerminales.unshift(new ProduccionAceptada(listaDeNoTerminales[0]+'´'));
-                    listaDeNoTerminales[0].producciones.push(listaDeNoTerminales[0], "ε");
+                    listaDeNoTerminales[0].producciones.push(listaDeNoTerminales[0].valor, "ε");
                     remplazarSimboloVacio(produccionesVar, noTerminal);
                 }else if(noTerminal == valor[k]){
                     remplazarSimboloVacio(produccionesVar, noTerminal);
