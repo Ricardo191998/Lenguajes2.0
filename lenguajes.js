@@ -35,7 +35,7 @@ function obtenerGramatica(){
         botonConvertir.innerHTML = "Convertir";
         botonConvertir.style.padding = "150px 0px";
 
-
+        console.log(q);
         botonConvertir.addEventListener('click',()=>{
             if(q == 0 || q == 4){
                 q++;
@@ -45,11 +45,15 @@ function obtenerGramatica(){
                 if(listaDeNoTerminales.length>1){
                     eliminacionSimbolosInaccesibles(listaDeNoTerminales[1].valor,1);
                 }else{
+                    var h3 = document.createElement("h3");
+                    h3.innerHTML = "Eliminaste símbolos inaccesibles";
+                    var body_programa = document.getElementById("body_programa");
+                    body_programa.appendChild(h3);
                     obtenerGramatica();
                 }
             }else if(q ==2 ){
                 q++;
-                if(listaDeNoTerminales.length>1){
+                if(listaDeNoTerminales.length>=1){
                     eliminacionProduccionesVacias();
                 }else{
                     obtenerGramatica();
@@ -57,22 +61,21 @@ function obtenerGramatica(){
                 
             }else if(q == 3){
                 q++;
-                if(listaDeNoTerminales.length>1){
+                if(listaDeNoTerminales.length>=1){
                     eliminacionSimbolosUnitarios();
                 }else{
                     obtenerGramatica();
                 }
             }else if(q == 6){
-                //Terminar algoritmos eh imprimir gramática impropia
-                divGramatica.remove();
+                /* //Terminar algoritmos eh imprimir gramática impropia
+                window.open("gramaticaPropia.html", "Diseño Web", "width=300, height=200")
+                var body_programa = document.getElementById("body_programa_g");
                 var divGramatica = document.createElement("div");
                 frontElementosGramatica(divGramatica);
                 divGramatica.id = "contenido";
                 body_programa.appendChild(divGramatica);
-                var h3 = document.createElement("h3");
-                h3.innerHTML = "Produccion propia";
                 body_programa.appendChild(h3);
-                return ;
+                return ;*/
             }
         });
         
@@ -324,7 +327,6 @@ function eliminacionSimbolosMuertos(tamanioProducciones){
         for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
             let produccionesVar = listaDeNoTerminales[i].producciones
             ban = true;
-            console.log(produccionesVar);
             for(var k = 0 ; k <  produccionesVar[n].length ; k++){
                 let valor = produccionesVar[n];
                 if(!recorrerListaNT(valor[k]) && valor[k] == valor[k].toUpperCase()){
@@ -332,7 +334,11 @@ function eliminacionSimbolosMuertos(tamanioProducciones){
                     if(n > 0 && ban == true ){
                         n = n-1;
                         ban = false;
-                    }else if(produccionesVar.length==0){
+                    }else if(n == 0){
+                        listaDeNoTerminales.splice(i,1);
+                        eliminacionSimbolosMuertos(listaDeNoTerminales.length);
+                        return;
+                    }else if(produccionesVar.length==0 && listaDeNoTerminales.length == 1){
                         alert("La gramatica se vacio");
                         location.reload();
                     }
@@ -363,8 +369,6 @@ function eliminacionSimbolosMuertos(tamanioProducciones){
         }
         c = 0 ; 
     }
-    
-    console.log(listaDeNoTerminales);
     if(listaDeNoTerminales.length<tamanioProducciones){
         eliminacionSimbolosMuertos(listaDeNoTerminales.length);
     }else{var h3 = document.createElement("h3");
@@ -424,7 +428,7 @@ function eliminacionProduccionesVacias(){
             let produccionesVar = listaDeNoTerminales[i].producciones
             for(var k = 0 ; k <  produccionesVar[n].length ; k++){
                 let valor = listaDeNoTerminales[i].producciones[n];
-                if(valor[k] == 'ε' && produccionesVar[n].length ==1){
+                if(valor[k] == 'ε' ){
                     listaNT.push(listaDeNoTerminales[i].valor);
                     produccionesVar.splice(n,1);
                     if(n >0){
@@ -435,12 +439,13 @@ function eliminacionProduccionesVacias(){
         }
     }
     if(listaNT.length != 0 ){
+        console.log(listaNT);
         for(var m = 0 ; m < listaNT.length; m++){
             for(var i = 0 ; i<listaDeNoTerminales.length; i++){
                 for(var n = 0 ; n < listaDeNoTerminales[i].producciones.length;n++){
                     let produccionesVar = listaDeNoTerminales[i].producciones
                     for(var k = 0 ; k <  produccionesVar[n].length ; k++){
-                        let valor = listaDeNoTerminales[i].producciones[n];
+                        let valor = produccionesVar[n];
                         if(valor[k] == listaDeNoTerminales[0].valor && listaNT[0] == listaDeNoTerminales[0].valor){
                             listaDeNoTerminales.unshift(new ProduccionAceptada(listaDeNoTerminales[0].valor+'´'));
                             listaDeNoTerminales[0].producciones.push(listaDeNoTerminales[1].valor);
